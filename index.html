@@ -4,36 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { background-color: #000; color: #0f0; font-family: monospace; padding: 20px; margin: 0; }
-        .terminal { border: 1px solid #0f0; padding: 15px; height: 75vh; overflow-y: auto; font-size: 14px; }
-        .input-area { margin-top: 10px; display: flex; color: #0f0; }
-        input { background: transparent; border: none; color: #0f0; outline: none; width: 100%; font-family: monospace; font-size: 16px; }
+        body { background-color: #000; color: #0f0; font-family: monospace; padding: 20px; margin: 0; overflow: hidden; }
+        .terminal { border: 1px solid #0f0; padding: 15px; height: 80vh; overflow-y: auto; font-size: 14px; background: rgba(0, 20, 0, 0.9); }
+        .input-area { margin-top: 10px; display: flex; color: #0f0; align-items: center; }
+        input { background: transparent; border: none; color: #0f0; outline: none; width: 100%; font-family: monospace; font-size: 16px; margin-left: 5px; }
+        .system-msg { color: yellow; margin: 5px 0; }
+        .error-msg { color: #f00; }
     </style>
 </head>
 <body>
-    <div class="terminal" id="log">
-        <div>[SYSTEM]: Инициализация протокола DUSK-NET...</div>
-        <div>[SYSTEM]: Соединение установлено.</div>
-        <div style="color: yellow;">ОБНАРУЖЕН ЗАШИФРОВАННЫЙ ФАЙЛ: 'SECRET_DATA.DAT'</div>
-        <div>----------------------------------------</div>
-        <div>Доступные команды: 'scan', 'help'</div>
-    </div>
-    <div class="input-area">> <input type="text" id="cmd" autofocus></div>
+    <div class="terminal" id="log"></div>
+    <div class="input-area">> <input type="text" id="cmd" autofocus autocomplete="off"></div>
 
     <script>
         const input = document.getElementById('cmd');
         const log = document.getElementById('log');
+        let currentStep = 'start';
 
-        function addLog(text, color = "#0f0") {
+        // Функция плавной печати текста
+        function addLog(text, color = "#0f0", delay = 30) {
             const div = document.createElement('div');
             div.style.color = color;
-            div.innerHTML = text;
             log.appendChild(div);
             log.scrollTop = log.scrollHeight;
+            
+            let i = 0;
+            const interval = setInterval(() => {
+                div.innerHTML += text[i];
+                i++;
+                if (i >= text.length) {
+                    clearInterval(interval);
+                    log.scrollTop = log.scrollHeight;
+                }
+            }, delay);
         }
+
+        // Стартовый экран
+        setTimeout(() => {
+            addLog("[SYSTEM]: Доступ к архиву ALPHA-99 получен...", "yellow");
+            setTimeout(() => {
+                addLog("----------------------------------------");
+                addLog("ВНИМАНИЕ: Требуется биометрическая идентификация куратора.");
+                addLog("Введите 'ID [имя_куратора]', чтобы подтвердить личность.", "cyan");
+                addLog("Подсказка: Вспомни, кто втянул тебя в это дело...", "#555");
+            }, 1500);
+        }, 500);
 
         input.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
+                const val = input.value.trim();
+                const lowerVal = val.toLowerCase();
+                addLog("> " + val, "#888", 0);
+                input.value = '';
+
+                if (lowerVal.startsWith('id ')) {
+                    const name = lowerVal.split(' ')[1];
+                    // Загадка: имя 'аноним' из сообщения бота
+                    if (name === 'аноним' || name === 'anonim') {
+                        addLog("ПРОВЕРКА ЛИЧНОСТИ...", "yellow");
+                        setTimeout(() => {
+                            addLog("ЛИЧНОСТЬ ПОДТВЕРЖДЕНА. ДОБРО ПОЖАЛОВАТЬ, КУРАТОР.", "#0f0");
+                            addLog("----------------------------------------");
+                            addLog("МАНУСКРИПТ: 'Проект DUSK-NET был создан для контроля... [ДАННЫЕ ПОВРЕЖДЕНЫ]'", "white");
+                            addLog("СЛЕДУЮЩАЯ ЦЕЛЬ: Взломать сервер правительства. Ждите инструкций в чате.", "magenta");
+                        }, 2000);
+                    } else {
+                        addLog("ОШИБКА: Пользователь '" + name + "' не найден в базе данных.", "red");
+                    }
+                } else if (lowerVal === 'help') {
+                    addLog("Доступные команды: ID [имя], clear", "#888");
+                } else {
+                    addLog("Команда не распознана. Используйте 'ID' или 'help'.", "#555");
+                }
+            }
+        });
+    </script>
+</body>
+</html>
                 const val = input.value.toLowerCase().trim();
                 addLog("> " + val);
                 input.value = '';
