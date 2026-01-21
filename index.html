@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background-color: #000; color: #0f0; font-family: monospace; padding: 20px; margin: 0; }
+        .terminal { border: 1px solid #0f0; padding: 15px; height: 70vh; overflow-y: auto; }
+        .input-area { margin-top: 10px; display: flex; }
+        input { background: transparent; border: none; color: #0f0; outline: none; width: 100%; font-family: monospace; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="terminal" id="log">
+        <div>[SYSTEM]: Вход в систему 'DUSK-NET'...</div>
+        <div>[SYSTEM]: Соединение стабильно.</div>
+        <div>----------------------------------------</div>
+        <div>Введите 'crack' для поиска улик.</div>
+    </div>
+    <div class="input-area">> <input type="text" id="cmd" autofocus></div>
+
+    <script>
+        const input = document.getElementById('cmd');
+        const log = document.getElementById('log');
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const val = input.value.toLowerCase().trim();
+                const div = document.createElement('div');
+                if(val === 'crack') {
+                    div.innerHTML = "<span style='color:yellow'>[ACCESS]: Доступ к архиву получен.</span><br>Найден файл: 'secret_chat.log'";
+                } else if (val === 'help') {
+                    div.innerText = "Команды: help, crack, clear";
+                } else {
+                    div.innerText = "> " + val + ": Ошибка доступа.";
+                }
+                log.appendChild(div);
+                input.value = '';
+                log.scrollTop = log.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>
