@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { background-color: #000; color: #0f0; font-family: monospace; padding: 20px; margin: 0; overflow: hidden; }
-        .terminal { border: 1px solid #0f0; padding: 15px; height: 80vh; overflow-y: auto; font-size: 14px; background: rgba(0, 20, 0, 0.9); }
+        .terminal { border: 1px solid #0f0; padding: 15px; height: 80vh; overflow-y: auto; font-size: 14px; background: rgba(0, 20, 0, 0.9); box-shadow: inset 0 0 10px #0f0; }
         .input-area { margin-top: 10px; display: flex; color: #0f0; align-items: center; }
         input { background: transparent; border: none; color: #0f0; outline: none; width: 100%; font-family: monospace; font-size: 16px; margin-left: 5px; }
-        .system-msg { color: yellow; margin: 5px 0; }
-        .error-msg { color: #f00; }
+        .system-msg { color: yellow; }
     </style>
 </head>
 <body>
@@ -19,14 +18,11 @@
     <script>
         const input = document.getElementById('cmd');
         const log = document.getElementById('log');
-        let currentStep = 'start';
 
-        // Функция плавной печати текста
-        function addLog(text, color = "#0f0", delay = 30) {
+        function addLog(text, color = "#0f0", speed = 30) {
             const div = document.createElement('div');
             div.style.color = color;
             log.appendChild(div);
-            log.scrollTop = log.scrollHeight;
             
             let i = 0;
             const interval = setInterval(() => {
@@ -36,17 +32,16 @@
                     clearInterval(interval);
                     log.scrollTop = log.scrollHeight;
                 }
-            }, delay);
+            }, speed);
         }
 
-        // Стартовый экран
+        // Приветствие при загрузке
         setTimeout(() => {
-            addLog("[SYSTEM]: Доступ к архиву ALPHA-99 получен...", "yellow");
+            addLog("[SYSTEM]: Доступ к архиву ALPHA-99 подтвержден.", "yellow");
             setTimeout(() => {
                 addLog("----------------------------------------");
-                addLog("ВНИМАНИЕ: Требуется биометрическая идентификация куратора.");
-                addLog("Введите 'ID [имя_куратора]', чтобы подтвердить личность.", "cyan");
-                addLog("Подсказка: Вспомни, кто втянул тебя в это дело...", "#555");
+                addLog("ВНИМАНИЕ: Требуется вторичная идентификация личности.");
+                addLog("Введите команду: ID [имя_того_кто_тебя_нанял]", "cyan");
             }, 1500);
         }, 500);
 
@@ -54,57 +49,33 @@
             if (e.key === 'Enter') {
                 const val = input.value.trim();
                 const lowerVal = val.toLowerCase();
-                addLog("> " + val, "#888", 0);
                 input.value = '';
+                
+                // Мгновенно отображаем ввод игрока
+                const userDiv = document.createElement('div');
+                userDiv.innerHTML = "> " + val;
+                userDiv.style.color = "#888";
+                log.appendChild(userDiv);
 
                 if (lowerVal.startsWith('id ')) {
                     const name = lowerVal.split(' ')[1];
-                    // Загадка: имя 'аноним' из сообщения бота
                     if (name === 'аноним' || name === 'anonim') {
-                        addLog("ПРОВЕРКА ЛИЧНОСТИ...", "yellow");
+                        addLog("ПРОВЕРКА БАЗЫ ДАННЫХ...", "yellow");
                         setTimeout(() => {
-                            addLog("ЛИЧНОСТЬ ПОДТВЕРЖДЕНА. ДОБРО ПОЖАЛОВАТЬ, КУРАТОР.", "#0f0");
-                            addLog("----------------------------------------");
-                            addLog("МАНУСКРИПТ: 'Проект DUSK-NET был создан для контроля... [ДАННЫЕ ПОВРЕЖДЕНЫ]'", "white");
-                            addLog("СЛЕДУЮЩАЯ ЦЕЛЬ: Взломать сервер правительства. Ждите инструкций в чате.", "magenta");
+                            addLog("ЛИЧНОСТЬ ПОДТВЕРЖДЕНА: АНОНИМ (КУРАТОР СЕКТОРА 7).", "#0f0");
+                            addLog("ОТКРЫВАЮ СЛЕДУЮЩИЙ ФАЙЛ...", "white");
+                            setTimeout(() => {
+                                addLog("СЮЖЕТ: Проект 'Затмение' начнется через 24 часа. Твоя цель — сервер в Таллине.", "magenta");
+                            }, 2000);
                         }, 2000);
                     } else {
-                        addLog("ОШИБКА: Пользователь '" + name + "' не найден в базе данных.", "red");
+                        addLog("ОШИБКА: Объект '" + name + "' не имеет прав доступа.", "red");
                     }
                 } else if (lowerVal === 'help') {
                     addLog("Доступные команды: ID [имя], clear", "#888");
                 } else {
-                    addLog("Команда не распознана. Используйте 'ID' или 'help'.", "#555");
+                    addLog("Система не узнает команду. Введите 'ID [имя]'.", "#555");
                 }
-            }
-        });
-    </script>
-</body>
-</html>
-                const val = input.value.toLowerCase().trim();
-                addLog("> " + val);
-                input.value = '';
-
-                if (val === 'help') {
-                    addLog("Команды: scan, unlock [пароль], clear", "#888");
-                } 
-                else if (val === 'scan') {
-                    addLog("Сканирование системы...");
-                    setTimeout(() => {
-                        addLog("Найдена подсказка: Пароль — это год создания GitHub.", "cyan");
-                    }, 1000);
-                } 
-                else if (val.startsWith('unlock ')) {
-                    const pass = val.split(' ')[1];
-                    if (pass === '2008') {
-                        addLog("ДОСТУП РАЗРЕШЕН!", "#0f0");
-                        addLog("СЕКРЕТНЫЙ КОД: 'ALPHA-99'", "white");
-                    } else {
-                        addLog("ОШИБКА: Неверный пароль.", "red");
-                    }
-                }
-                else if (val === 'clear') { log.innerHTML = ''; }
-                else { addLog("Неизвестная команда.", "#555"); }
             }
         });
     </script>
