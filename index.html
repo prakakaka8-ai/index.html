@@ -5,37 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { background-color: #000; color: #0f0; font-family: monospace; padding: 20px; margin: 0; }
-        .terminal { border: 1px solid #0f0; padding: 15px; height: 70vh; overflow-y: auto; }
-        .input-area { margin-top: 10px; display: flex; }
-        input { background: transparent; border: none; color: #0f0; outline: none; width: 100%; font-family: monospace; font-size: 18px; }
+        .terminal { border: 1px solid #0f0; padding: 15px; height: 75vh; overflow-y: auto; font-size: 14px; }
+        .input-area { margin-top: 10px; display: flex; color: #0f0; }
+        input { background: transparent; border: none; color: #0f0; outline: none; width: 100%; font-family: monospace; font-size: 16px; }
     </style>
 </head>
 <body>
     <div class="terminal" id="log">
-        <div>[SYSTEM]: Вход в систему 'DUSK-NET'...</div>
-        <div>[SYSTEM]: Соединение стабильно.</div>
+        <div>[SYSTEM]: Инициализация протокола DUSK-NET...</div>
+        <div>[SYSTEM]: Соединение установлено.</div>
+        <div style="color: yellow;">ОБНАРУЖЕН ЗАШИФРОВАННЫЙ ФАЙЛ: 'SECRET_DATA.DAT'</div>
         <div>----------------------------------------</div>
-        <div>Введите 'crack' для поиска улик.</div>
+        <div>Доступные команды: 'scan', 'help'</div>
     </div>
     <div class="input-area">> <input type="text" id="cmd" autofocus></div>
 
     <script>
         const input = document.getElementById('cmd');
         const log = document.getElementById('log');
+
+        function addLog(text, color = "#0f0") {
+            const div = document.createElement('div');
+            div.style.color = color;
+            div.innerHTML = text;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+
         input.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 const val = input.value.toLowerCase().trim();
-                const div = document.createElement('div');
-                if(val === 'crack') {
-                    div.innerHTML = "<span style='color:yellow'>[ACCESS]: Доступ к архиву получен.</span><br>Найден файл: 'secret_chat.log'";
-                } else if (val === 'help') {
-                    div.innerText = "Команды: help, crack, clear";
-                } else {
-                    div.innerText = "> " + val + ": Ошибка доступа.";
-                }
-                log.appendChild(div);
+                addLog("> " + val);
                 input.value = '';
-                log.scrollTop = log.scrollHeight;
+
+                if (val === 'help') {
+                    addLog("Команды: scan, unlock [пароль], clear", "#888");
+                } 
+                else if (val === 'scan') {
+                    addLog("Сканирование системы...");
+                    setTimeout(() => {
+                        addLog("Найдена подсказка: Пароль — это год создания GitHub.", "cyan");
+                    }, 1000);
+                } 
+                else if (val.startsWith('unlock ')) {
+                    const pass = val.split(' ')[1];
+                    if (pass === '2008') {
+                        addLog("ДОСТУП РАЗРЕШЕН!", "#0f0");
+                        addLog("СЕКРЕТНЫЙ КОД: 'ALPHA-99'", "white");
+                    } else {
+                        addLog("ОШИБКА: Неверный пароль.", "red");
+                    }
+                }
+                else if (val === 'clear') { log.innerHTML = ''; }
+                else { addLog("Неизвестная команда.", "#555"); }
             }
         });
     </script>
