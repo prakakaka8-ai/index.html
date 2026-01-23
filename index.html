@@ -3,27 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DUSK-NET Terminal</title>
     <style>
         body { background-color: #000; color: #0f0; font-family: monospace; padding: 20px; margin: 0; overflow: hidden; }
         .terminal { border: 1px solid #0f0; padding: 15px; height: 80vh; overflow-y: auto; font-size: 14px; background: rgba(0, 20, 0, 0.9); box-shadow: inset 0 0 10px #0f0; }
         .input-area { margin-top: 10px; display: flex; color: #0f0; align-items: center; }
         input { background: transparent; border: none; color: #0f0; outline: none; width: 100%; font-family: monospace; font-size: 16px; margin-left: 5px; }
-        .system-msg { color: yellow; }
     </style>
 </head>
 <body>
     <div class="terminal" id="log"></div>
     <div class="input-area">> <input type="text" id="cmd" autofocus autocomplete="off"></div>
 
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         const input = document.getElementById('cmd');
         const log = document.getElementById('log');
+        let isAuthorized = false;
 
         function addLog(text, color = "#0f0", speed = 30) {
             const div = document.createElement('div');
             div.style.color = color;
             log.appendChild(div);
-            
             let i = 0;
             const interval = setInterval(() => {
                 div.innerHTML += text[i];
@@ -34,6 +35,60 @@
                 }
             }, speed);
         }
+
+        // Стартовое сообщение
+        setTimeout(() => {
+            addLog("[SYSTEM]: Доступ к архиву ALPHA-99 подтвержден.", "yellow");
+            setTimeout(() => {
+                addLog("Введите 'ID [имя_куратора]' для входа в систему.", "cyan");
+            }, 1000);
+        }, 500);
+
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const val = input.value.trim();
+                const lowerVal = val.toLowerCase();
+                input.value = '';
+                
+                const userDiv = document.createElement('div');
+                userDiv.innerHTML = "> " + val;
+                userDiv.style.color = "#888";
+                log.appendChild(userDiv);
+
+                if (lowerVal.startsWith('id ')) {
+                    const name = lowerVal.split(' ')[1];
+                    if (name === 'аноним' || name === 'anonim') {
+                        isAuthorized = true;
+                        addLog("ЛИЧНОСТЬ ПОДТВЕРЖДЕНА: АНОНИМ.", "#0f0");
+                        addLog("Доступна команда: 'download'", "yellow");
+                    } else {
+                        addLog("ОШИБКА: Доступ запрещен.", "red");
+                    }
+                } else if (lowerVal === 'download') {
+                    if (isAuthorized) {
+                        addLog("СКАЧИВАНИЕ ФАЙЛА 'MAP_ZETA.IMG'...", "cyan");
+                        setTimeout(() => {
+                            addLog("ЗАГРУЗКА ЗАВЕРШЕНА. ПРОВЕРЬТЕ ЛИЧНЫЕ СООБЩЕНИЯ.", "white");
+                            addLog("Введите 'exit' для доклада.", "yellow");
+                        }, 2000);
+                    } else {
+                        addLog("ОШИБКА: Сначала пройдите идентификацию.", "red");
+                    }
+                } else if (lowerVal === 'exit') {
+                    addLog("ВЫХОД...", "red");
+                    setTimeout(() => {
+                        if (window.Telegram && window.Telegram.WebApp) {
+                            window.Telegram.WebApp.close();
+                        }
+                    }, 1000);
+                } else {
+                    addLog("Команда не распознана.", "#555");
+                }
+            }
+        });
+    </script>
+</body>
+</html>
 
         // Приветствие при загрузке
         setTimeout(() => {
